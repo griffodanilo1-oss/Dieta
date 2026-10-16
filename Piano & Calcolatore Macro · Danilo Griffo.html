@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>Piano & Calcolatore Macro · Danilo Griffo</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f8fafc;--muted:#94a3b8;--accent:#10b981;--pro:#3b82f6;--cho:#f59e0b;--fat:#ec4899;--kcal:#10b981;--danger:#ef4444;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+body{background-color:var(--bg);color:var(--text);padding-bottom:60px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.container{max-width:900px;margin:0 auto;padding:16px}
+header{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+.brand h1{font-size:1.35rem;font-weight:800;letter-spacing:-.3px;color:#fff}
+.brand p{font-size:.85rem;color:var(--muted)}
+.bia-badges{display:flex;flex-wrap:wrap;gap:8px}
+.bia-badge{background:rgba(255,255,255,.05);border:1px solid var(--border);padding:6px 10px;border-radius:8px;font-size:.75rem;color:var(--muted)}
+.bia-badge strong{color:var(--text);font-size:.82rem}
+.dashboard{position:sticky;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:50;background:rgba(30,41,59,.95);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:16px;padding:14px 18px;margin-bottom:18px;box-shadow:0 10px 25px rgba(0,0,0,.4)}
+.macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:600px){.macro-grid{grid-template-columns:repeat(2,1fr)}}
+.macro-box{background:rgba(15,23,42,.6);border-radius:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.05)}
+.macro-header{display:flex;justify-content:space-between;font-size:.78rem;font-weight:600;margin-bottom:4px}
+.macro-values{font-size:1.05rem;font-weight:800;margin-bottom:6px}
+.macro-values span.target{font-size:.8rem;font-weight:500;color:var(--muted)}
+.progress-bg{width:100%;height:7px;background:#0f172a;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;transition:width .25s ease}
+.controls-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:18px}
+.controls-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:10px;font-weight:700}
+.day-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+@media (min-width:680px){.day-tabs{grid-template-columns:repeat(4,1fr)}}
+.tab-btn{background:#0f172a;border:1px solid var(--border);color:var(--muted);padding:10px 12px;border-radius:10px;cursor:pointer;font-size:.82rem;font-weight:600;text-align:left;transition:all .2s}
+.tab-btn span.sub{display:block;font-size:.7rem;font-weight:400;opacity:.8;margin-top:2px}
+.tab-btn.active{background:rgba(16,185,129,.15);border-color:var(--accent);color:#fff}
+.bottom-controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding-top:12px;border-top:1px solid var(--border)}
+.on-off-switch{display:flex;gap:8px;background:#0f172a;padding:4px;border-radius:10px;border:1px solid var(--border)}
+.wo-btn{border:none;background:transparent;color:var(--muted);padding:8px 16px;border-radius:7px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s}
+.wo-btn.active-on{background:var(--accent);color:#052e16}
+.wo-btn.active-off{background:#f59e0b;color:#451a03}
+.water-box{display:flex;align-items:center;gap:10px;font-size:.85rem}
+.water-btn{background:#0284c7;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.8rem}
+.meal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px;transition:border-color .2s}
+.meal-card.completed{border-color:var(--accent);opacity:.85}
+.meal-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.meal-title-wrap{display:flex;align-items:center;gap:10px}
+.meal-check{width:20px;height:20px;accent-color:var(--accent);cursor:pointer}
+.meal-title{font-size:1.05rem;font-weight:700;color:#fff}
+.meal-time-tag{font-size:.72rem;background:rgba(255,255,255,.07);padding:3px 8px;border-radius:6px;color:var(--muted)}
+.meal-macros-pill{font-size:.78rem;background:#0f172a;padding:6px 10px;border-radius:8px;border:1px solid var(--border);color:var(--muted)}
+.meal-macros-pill strong{color:#fff}
+.preset-options{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.preset-pill{background:#0f172a;border:1px solid var(--border);color:var(--muted);padding:6px 11px;border-radius:8px;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .15s}
+.preset-pill.active{background:#3b82f6;border-color:#60a5fa;color:#fff}
+.meal-note{font-size:.78rem;color:#38bdf8;background:rgba(56,189,248,.1);border-left:3px solid #38bdf8;padding:8px 10px;border-radius:4px;margin-bottom:12px}
+.ingredients-list{display:flex;flex-direction:column;gap:8px}
+.ing-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;background:rgba(15,23,42,.65);border:1px solid rgba(255,255,255,.05);padding:8px 12px;border-radius:10px;gap:8px}
+.ing-left{display:flex;align-items:center;gap:8px;flex:1;min-width:180px}
+.food-select{background:#1e293b;color:#fff;border:1px solid var(--border);padding:6px 8px;border-radius:7px;font-size:.85rem;font-weight:600;width:100%;max-width:260px}
+.ing-controls{display:flex;align-items:center;gap:6px}
+.qty-btn{background:#334155;color:#fff;border:none;width:28px;height:28px;border-radius:6px;font-weight:700;cursor:pointer}
+.qty-btn:hover{background:#475569}
+.qty-input{width:60px;text-align:center;background:#0f172a;color:#fff;border:1px solid var(--border);border-radius:6px;padding:5px;font-size:.85rem;font-weight:700}
+.unit-label{font-size:.78rem;color:var(--muted);width:22px}
+.ing-macros{font-size:.74rem;color:var(--muted);min-width:155px;text-align:right}
+.del-btn{background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:.9rem;padding:2px 6px}
+.add-ing-bar{margin-top:10px;display:flex;gap:8px}
+.add-btn{background:rgba(255,255,255,.05);border:1px dashed var(--border);color:var(--muted);padding:7px 12px;border-radius:8px;font-size:.78rem;cursor:pointer;width:100%;transition:all .2s}
+.add-btn:hover{color:#fff;border-color:var(--muted)}
+.washout-card{background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(15,23,42,.9));border:1px solid rgba(16,185,129,.35);border-radius:16px;padding:16px;margin-top:20px}
+.washout-card h3{font-size:.95rem;color:var(--accent);margin-bottom:8px}
+.washout-list{list-style:none;font-size:.82rem;color:var(--text);display:grid;gap:6px}
+.washout-list li{display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="brand">
+      <h1>Piano Nutrizionale & Macro Calculator</h1>
+      <p>Danilo Griffo · Ricomposizione Corporea & Ciclizzazione ON/OFF</p>
+    </div>
+    <div class="bia-badges">
+      <div class="bia-badge">BMR: <strong>1646 kcal</strong></div>
+      <div class="bia-badge">TDEE: <strong>2469 kcal</strong></div>
+      <div class="bia-badge">FFM: <strong>54,2 kg (84%)</strong></div>
+      <div class="bia-badge">BCM: <strong>30,9 kg</strong></div>
+    </div>
+  </header>
+
+  <div class="dashboard">
+    <div class="macro-grid">
+      <div class="macro-box">
+        <div class="macro-header"><span style="color:var(--kcal)">CALORIE</span><span id="kcal-pct">0%</span></div>
+        <div class="macro-values"><span id="kcal-cur">0</span> <span class="target">/ <span id="kcal-tar">2100</span> kcal</span></div>
+        <div class="progress-bg"><div id="kcal-bar" class="progress-fill" style="background:var(--kcal);width:0%"></div></div>
+      </div>
+      <div class="macro-box">
+        <div class="macro-header"><span style="color:var(--pro)">PROTEINE</span><span id="pro-pct">0%</span></div>
+        <div class="macro-values"><span id="pro-cur">0</span> <span class="target">/ <span id="pro-tar">160</span> g</span></div>
+        <div class="progress-bg"><div id="pro-bar" class="progress-fill" style="background:var(--pro);width:0%"></div></div>
+      </div>
+      <div class="macro-box">
+        <div class="macro-header"><span style="color:var(--cho)">CARBOIDRATI</span><span id="cho-pct">0%</span></div>
+        <div class="macro-values"><span id="cho-cur">0</span> <span class="target">/ <span id="cho-tar">220</span> g</span></div>
+        <div class="progress-bg"><div id="cho-bar" class="progress-fill" style="background:var(--cho);width:0%"></div></div>
+      </div>
+      <div class="macro-box">
+        <div class="macro-header"><span style="color:var(--fat)">GRASSI</span><span id="fat-pct">0%</span></div>
+        <div class="macro-values"><span id="fat-cur">0</span> <span class="target">/ <span id="fat-tar">62</span> g</span></div>
+        <div class="progress-bg"><div id="fat-bar" class="progress-fill" style="background:var(--fat);width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-panel">
+    <div class="controls-title">1. Seleziona la struttura della giornata</div>
+    <div class="day-tabs">
+      <button class="tab-btn active" onclick="setDayMode('lmv')" id="tab-lmv">⚡ Lun / Mer / Ven<span class="sub">Colazione veloce (5 min)</span></button>
+      <button class="tab-btn" onclick="setDayMode('mg_no_col')" id="tab-mg_no_col">🛌 Mar / Gio (Opz. A)<span class="sub">Senza Colazione (3 pasti)</span></button>
+      <button class="tab-btn" onclick="setDayMode('mg_col')" id="tab-mg_col">🥞 Mar / Gio (Opz. B)<span class="sub">Con Colazione (4 pasti)</span></button>
+      <button class="tab-btn" onclick="setDayMode('buffer')" id="tab-buffer">🍕 Sab/Dom 24-25 Ott<span class="sub">Protocollo Buffer Pizza</span></button>
+    </div>
+    <div class="bottom-controls">
+      <div class="on-off-switch">
+        <button class="wo-btn active-on" id="btn-on" onclick="setWorkoutMode(true)">🏋️‍♂️ GIORNO ON (Allenamento)</button>
+        <button class="wo-btn" id="btn-off" onclick="setWorkoutMode(false)">🔋 GIORNO OFF (Riposo)</button>
+      </div>
+      <div class="water-box">
+        <span>💧 Acqua: <strong id="water-val">0.0</strong> / 3.5 L</span>
+        <button class="water-btn" onclick="addWater(0.25)">+250 ml</button>
+        <button class="water-btn" style="background:#334155" onclick="addWater(-0.25)">-</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="meals-container"></div>
+
+  <div class="washout-card">
+    <h3>📋 Checklist Washout Idrico (Lun 19 – Gio 22 Ott) per Pesata e Foto di Venerdì 23</h3>
+    <ul class="washout-list">
+      <li><input type="checkbox" data-w onchange="saveState()"> <strong>Mercoledì e Giovedì zero affettati in vaschetta:</strong> usa solo pollo, tacchino fresco, pesce, uova, albume o yogurt greco 0% per tagliare il sodio nascosto.</li>
+      <li><input type="checkbox" data-w onchange="saveState()"> <strong>Acqua costante (3,0 – 3,5 L/die):</strong> mantiene basso l'aldosterone ed elimina la ritenzione extracellulare post-weekend.</li>
+      <li><input type="checkbox" data-w onchange="saveState()"> <strong>Cena di Giovedì entro le 21:00:</strong> pesce bianco o pollo + riso/patate per avere lo stomaco vuoto venerdì mattina a digiuno.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const FOODS = {
+  albume: { name: "Albume liquido", kcal: 48, p: 10.5, c: 0.7, f: 0.0, unit: "ml" },
+  uovo_intero: { name: "Uovo intero (1 medio = 60g)", kcal: 143, p: 12.6, c: 0.7, f: 9.5, unit: "g" },
+  farina_avena: { name: "Farina / Fiocchi d'avena", kcal: 370, p: 13.5, c: 62.0, f: 7.0, unit: "g" },
+  nutella: { name: "Nutella", kcal: 539, p: 6.3, c: 57.5, f: 30.9, unit: "g" },
+  yogurt_greco: { name: "Yogurt Greco 0%", kcal: 54, p: 10.3, c: 4.0, f: 0.0, unit: "g" },
+  cereali_fette: { name: "Corn Flakes / Fette biscottate", kcal: 380, p: 8.0, c: 82.0, f: 1.5, unit: "g" },
+  pane: { name: "Pane / Pancarrè / Integrale", kcal: 255, p: 8.5, c: 49.0, f: 2.5, unit: "g" },
+  whey: { name: "Whey Protein in polvere", kcal: 380, p: 80.0, c: 5.0, f: 4.0, unit: "g" },
+  fesa_tacchino: { name: "Fesa di tacchino / Bresaola", kcal: 110, p: 24.0, c: 1.0, f: 1.5, unit: "g" },
+  gallette: { name: "Gallette di riso / mais", kcal: 380, p: 8.0, c: 81.0, f: 2.0, unit: "g" },
+  frutto: { name: "Frutto (Banana / Mela)", kcal: 75, p: 1.0, c: 17.5, f: 0.2, unit: "g" },
+  riso_pasta: { name: "Riso Basmati / Pasta (a crudo)", kcal: 355, p: 8.5, c: 78.0, f: 1.0, unit: "g" },
+  patate: { name: "Patate (pesate a crudo)", kcal: 77, p: 2.0, c: 17.5, f: 0.1, unit: "g" },
+  pollo_tacchino: { name: "Petto di Pollo / Tacchino", kcal: 105, p: 23.5, c: 0.0, f: 1.2, unit: "g" },
+  pesce_bianco: { name: "Merluzzo / Orata / Spigola", kcal: 82, p: 18.0, c: 0.0, f: 1.0, unit: "g" },
+  manzo_magro: { name: "Manzo magro", kcal: 132, p: 22.0, c: 0.0, f: 4.5, unit: "g" },
+  parmigiano: { name: "Parmigiano Reggiano", kcal: 402, p: 32.0, c: 0.0, f: 30.0, unit: "g" },
+  olio_evo: { name: "Olio Extravergine (EVO)", kcal: 899, p: 0.0, c: 0.0, f: 99.9, unit: "g" },
+  verdura: { name: "Zucchine / Finocchi / Insalata", kcal: 20, p: 1.2, c: 3.5, f: 0.1, unit: "g" },
+  pizza_libera: { name: "Buffer Serata Pizza + Sfizi (Stima)", kcal: 260, p: 10.0, c: 33.0, f: 9.5, unit: "g" }
+};
+
+let state = { dayMode: 'lmv', isOn: true, water: 0.0, meals: [], saved: {} };
+const STORE_KEY = 'piano-macro-v1';
+const DAY_MODES = ['lmv', 'mg_no_col', 'mg_col', 'buffer'];
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      date: todayStr(), dayMode: state.dayMode, isOn: state.isOn, water: state.water, saved: state.saved,
+      washout: Array.from(document.querySelectorAll('[data-w]')).map(c => c.checked)
+    }));
+  } catch (e) {}
+}
+
+function validSaved(saved) {
+  if (!saved || typeof saved !== 'object') return {};
+  const out = {};
+  Object.keys(saved).forEach(k => {
+    const meals = saved[k];
+    const ok = Array.isArray(meals) && meals.every(m => m && Array.isArray(m.options) && m.options[m.activeOption] &&
+      m.options.every(o => Array.isArray(o.items) && o.items.every(it => FOODS[it.food] && typeof it.qty === 'number')));
+    if (ok) out[k] = meals;
+  });
+  return out;
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (DAY_MODES.includes(d.dayMode)) state.dayMode = d.dayMode;
+    if (typeof d.isOn === 'boolean') state.isOn = d.isOn;
+    if (d.date === todayStr()) {
+      if (typeof d.water === 'number') state.water = d.water;
+      state.saved = validSaved(d.saved);
+    }
+    if (Array.isArray(d.washout)) document.querySelectorAll('[data-w]').forEach((c, i) => { c.checked = !!d.washout[i]; });
+  } catch (e) {}
+}
+
+function syncControls() {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + state.dayMode).classList.add('active');
+  document.getElementById('btn-on').className = 'wo-btn ' + (state.isOn ? 'active-on' : '');
+  document.getElementById('btn-off').className = 'wo-btn ' + (!state.isOn ? 'active-off' : '');
+  document.getElementById('water-val').textContent = state.water.toFixed(2);
+}
+
+function getTargets() {
+  if (state.dayMode === 'buffer') return { kcal: 2200, p: 155, c: 210, f: 75 };
+  return state.isOn ? { kcal: 2100, p: 160, c: 220, f: 62 } : { kcal: 1800, p: 160, c: 140, f: 67 };
+}
+
+function buildPresetMeals(dayMode, isOn) {
+  if (dayMode === 'lmv') {
+    return [
+      { id: "colazione", title: "1. Colazione Lampo (5 min)", tag: "Lun / Mer / Ven",
+        note: "Se scegli il Tortino o le Crepes puoi cuocerli la sera prima e scaldarli 20 secondi al mattino con la Nutella.",
+        completed: false, activeOption: 0,
+        options: [
+          { label: "🧁 Opz 1: Tortino Sera Prima", items: [{ food: "albume", qty: 100 }, { food: "farina_avena", qty: 50 }, { food: "yogurt_greco", qty: 50 }, { food: "nutella", qty: 20 }] },
+          { label: "🥞 Opz 2: 2 Crepes Veloci", items: [{ food: "albume", qty: 100 }, { food: "farina_avena", qty: 45 }, { food: "nutella", qty: 20 }] },
+          { label: "🥣 Opz 3: Yogurt & Cereali (Zero Cottura)", items: [{ food: "yogurt_greco", qty: 170 }, { food: "cereali_fette", qty: 40 }, { food: "nutella", qty: 15 }] },
+          { label: "🍞 Opz 4: Toast Nutella + Whey", items: [{ food: "pane", qty: 50 }, { food: "nutella", qty: 20 }, { food: "whey", qty: 25 }] }
+        ] },
+      { id: "spuntino_mattina", title: "2. Spuntino Metà Mattina", tag: "Al lavoro · Veloce",
+        note: "Mercoledì e Giovedì preferisci lo Yogurt Greco 0% al posto degli affettati per scaricare il sodio.",
+        completed: false, activeOption: 0,
+        options: [
+          { label: "🥩 Tacchino + Gallette", items: isOn ? [{ food: "fesa_tacchino", qty: 80 }, { food: "gallette", qty: 30 }] : [{ food: "fesa_tacchino", qty: 90 }] },
+          { label: "🍦 Yogurt Greco 0%", items: isOn ? [{ food: "yogurt_greco", qty: 170 }, { food: "frutto", qty: 150 }] : [{ food: "yogurt_greco", qty: 200 }] }
+        ] },
+      { id: "pranzo", title: "3. Pranzo", tag: isOn ? "Giorno ON · Carbo medi/alti" : "Giorno OFF · Carbo controllati",
+        note: "Il Parmigiano sostituisce i grassi della frutta secca.",
+        completed: false, activeOption: 0,
+        options: [
+          { label: "🍚 Riso/Pasta + Pollo", items: [{ food: "riso_pasta", qty: isOn ? 100 : 70 }, { food: "pollo_tacchino", qty: 200 }, { food: "parmigiano", qty: 10 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 15 }] },
+          { label: "🥔 Patate + Manzo/Pollo", items: [{ food: "patate", qty: isOn ? 400 : 280 }, { food: "manzo_magro", qty: 180 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 15 }] }
+        ] },
+      { id: "spuntino_pom", title: "4. Spuntino Pomeridiano / Peri-Workout", tag: isOn ? "Pre/Post Allenamento" : "Pomeriggio Riposo",
+        note: "", completed: false, activeOption: 0,
+        options: [
+          { label: "🥤 Whey + Gallette", items: isOn ? [{ food: "whey", qty: 30 }, { food: "gallette", qty: 40 }] : [{ food: "whey", qty: 30 }, { food: "nutella", qty: 15 }] },
+          { label: "🥣 Yogurt Greco + Gallette/Nutella", items: isOn ? [{ food: "yogurt_greco", qty: 200 }, { food: "gallette", qty: 40 }] : [{ food: "yogurt_greco", qty: 170 }, { food: "nutella", qty: 15 }] }
+        ] },
+      { id: "cena", title: "5. Cena", tag: "Recupero Serale", note: "", completed: false, activeOption: 0,
+        options: [
+          { label: "🍗 Pollo + Riso/Pane", items: [{ food: isOn ? "riso_pasta" : "pane", qty: isOn ? 70 : 45 }, { food: "pollo_tacchino", qty: 220 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 20 }] },
+          { label: "🐟 Pesce Bianco + Patate", items: [{ food: "patate", qty: isOn ? 300 : 180 }, { food: "pesce_bianco", qty: 250 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 20 }] }
+        ] }
+    ];
+  }
+
+  if (dayMode === 'mg_no_col') {
+    return [
+      { id: "pranzo_big", title: "1. Pranzo Rinforzato (Primo pasto)", tag: "Mar / Gio · Senza Colazione",
+        note: "Avendo saltato la colazione, alziamo la quota proteica e glucidica del pranzo.",
+        completed: false, activeOption: 0,
+        options: [
+          { label: "🍚 Riso/Pasta + Pollo + Parmigiano", items: [{ food: "riso_pasta", qty: isOn ? 120 : 80 }, { food: "pollo_tacchino", qty: 220 }, { food: "parmigiano", qty: 15 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: isOn ? 15 : 20 }] },
+          { label: "🥔 Patate + Manzo Magro", items: [{ food: "patate", qty: isOn ? 460 : 320 }, { food: "manzo_magro", qty: 210 }, { food: "parmigiano", qty: 15 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 15 }] }
+        ] },
+      { id: "merenda_big", title: "2. Spuntino Pomeridiano Strutturato (Peri-WO)", tag: "Recupero quota colazione",
+        note: "Qui recuperi le proteine e il gusto dolce che non hai fatto al mattino.",
+        completed: false, activeOption: 0,
+        options: [
+          { label: "🥞 Crepes / Tortino con Nutella", items: [{ food: "albume", qty: isOn ? 150 : 120 }, { food: "farina_avena", qty: isOn ? 60 : 40 }, { food: "nutella", qty: 20 }] },
+          { label: "🥤 Whey + Gallette + Nutella", items: [{ food: "whey", qty: 35 }, { food: "gallette", qty: isOn ? 50 : 25 }, { food: "nutella", qty: 20 }] }
+        ] },
+      { id: "cena_big", title: "3. Cena", tag: "Secondo pasto principale", note: "", completed: false, activeOption: 0,
+        options: [
+          { label: "🍗 Pollo/Tacchino + Riso/Pane", items: [{ food: isOn ? "riso_pasta" : "pane", qty: isOn ? 80 : 50 }, { food: "pollo_tacchino", qty: 230 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 20 }] },
+          { label: "🐟 Pesce Bianco + Patate", items: [{ food: "patate", qty: isOn ? 350 : 200 }, { food: "pesce_bianco", qty: 260 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 20 }] }
+        ] }
+    ];
+  }
+
+  if (dayMode === 'mg_col') {
+    return [
+      { id: "colazione_comoda", title: "1. Colazione (Senza fretta · 4 pasti totali)", tag: "Mar / Gio · Mattina libera",
+        note: "Facendo colazione più tardi, salti lo spuntino di metà mattina e vai dritto al pranzo.",
+        completed: false, activeOption: 0,
+        options: [
+          { label: "🥞 Crepes / Pancake con Nutella", items: [{ food: "albume", qty: 120 }, { food: "farina_avena", qty: 50 }, { food: "nutella", qty: 20 }] },
+          { label: "🍰 Tiramisù Fit & Nutella", items: [{ food: "yogurt_greco", qty: 170 }, { food: "cereali_fette", qty: 40 }, { food: "nutella", qty: 15 }] },
+          { label: "🍳 Salata: Pane + Uova", items: [{ food: "pane", qty: 60 }, { food: "uovo_intero", qty: 60 }, { food: "albume", qty: 80 }] }
+        ] },
+      { id: "pranzo_mg", title: "2. Pranzo", tag: "Pasto principale", note: "", completed: false, activeOption: 0,
+        options: [
+          { label: "🍚 Riso/Pasta + Pollo", items: [{ food: "riso_pasta", qty: isOn ? 110 : 75 }, { food: "pollo_tacchino", qty: 200 }, { food: "parmigiano", qty: 10 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 15 }] }
+        ] },
+      { id: "spuntino_mg", title: "3. Spuntino Pomeridiano", tag: "Peri-Workout", note: "", completed: false, activeOption: 0,
+        options: [
+          { label: "🥤 Whey/Yogurt + Gallette + Nutella", items: [{ food: "whey", qty: 30 }, { food: "gallette", qty: isOn ? 40 : 20 }, { food: "nutella", qty: 15 }] }
+        ] },
+      { id: "cena_mg", title: "4. Cena", tag: "Recupero Serale", note: "", completed: false, activeOption: 0,
+        options: [
+          { label: "🍗 Pollo/Pesce + Riso/Patate", items: [{ food: isOn ? "riso_pasta" : "pane", qty: isOn ? 70 : 40 }, { food: "pollo_tacchino", qty: 220 }, { food: "verdura", qty: 200 }, { food: "olio_evo", qty: 20 }] }
+        ] }
+    ];
+  }
+
+  // MODALITÀ BUFFER PIZZA (24-25 OTTOBRE)
+  return [
+    { id: "buf_col", title: "1. Colazione Proteica Leggera (Buffer)", tag: "Sab 24 / Dom 25 Ott",
+      note: "Teniamo bassi carboidrati e grassi durante il giorno per lasciare 1500+ kcal libere a cena senza ingrassare.",
+      completed: false, activeOption: 0,
+      options: [
+        { label: "🍦 Yogurt Greco 0% + Caffè", items: [{ food: "yogurt_greco", qty: 200 }] },
+        { label: "🥤 Shaker Whey Veloce", items: [{ food: "whey", qty: 30 }] }
+      ] },
+    { id: "buf_pra", title: "2. Pranzo Scarico (PSMF)", tag: "Alta sazietà · Poche calorie",
+      note: "Solo proteine magre e verdura fibrosa.", completed: false, activeOption: 0,
+      options: [
+        { label: "🍗 Pollo/Tacchino + Verdura", items: [{ food: "pollo_tacchino", qty: 250 }, { food: "verdura", qty: 250 }, { food: "olio_evo", qty: 5 }] }
+      ] },
+    { id: "buf_spu", title: "3. Spuntino Pre-Serata", tag: "Salva-muscolo", note: "", completed: false, activeOption: 0,
+      options: [
+        { label: "🥩 Whey o Yogurt Greco 0%", items: [{ food: "whey", qty: 30 }] }
+      ] },
+    { id: "buf_cena", title: "4. PASTO LIBERO SERALE (Pizza & Sfizi)", tag: "~1450 kcal di margine",
+      note: "Goditi la serata senza pensieri: i muscoli useranno i carboidrati della pizza per ricaricare il glicogeno!",
+      completed: false, activeOption: 0,
+      options: [
+        { label: "🍕 Pizza + Antipasto / Birra (Buffer 550g stimati)", items: [{ food: "pizza_libera", qty: 550 }] }
+      ] }
+  ];
+}
+
+function initPlan() {
+  const k = state.dayMode + '|' + (state.isOn ? 1 : 0);
+  if (!state.saved[k]) state.saved[k] = buildPresetMeals(state.dayMode, state.isOn);
+  state.meals = state.saved[k];
+  renderAll();
+}
+
+function setDayMode(mode) {
+  state.dayMode = mode;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + mode).classList.add('active');
+  initPlan();
+}
+
+function setWorkoutMode(isOn) {
+  state.isOn = isOn;
+  document.getElementById('btn-on').className = 'wo-btn ' + (isOn ? 'active-on' : '');
+  document.getElementById('btn-off').className = 'wo-btn ' + (!isOn ? 'active-off' : '');
+  initPlan();
+}
+
+function addWater(amount) {
+  state.water = Math.max(0, Math.min(6, +(state.water + amount).toFixed(2)));
+  saveState();
+  document.getElementById('water-val').textContent = state.water.toFixed(2);
+}
+
+function activeOpt(mealIdx) { const m = state.meals[mealIdx]; return m.options[m.activeOption]; }
+function selectMealOption(mealIdx, optIdx) { state.meals[mealIdx].activeOption = optIdx; renderAll(); }
+function toggleMealComplete(mealIdx) { state.meals[mealIdx].completed = !state.meals[mealIdx].completed; renderAll(); }
+function changeFoodType(mealIdx, itemIdx, key) { activeOpt(mealIdx).items[itemIdx].food = key; renderAll(); }
+function adjustQty(mealIdx, itemIdx, delta) { const it = activeOpt(mealIdx).items[itemIdx]; it.qty = Math.max(0, it.qty + delta); renderAll(); }
+function setExactQty(mealIdx, itemIdx, val) { activeOpt(mealIdx).items[itemIdx].qty = Math.max(0, parseFloat(val) || 0); renderAll(); }
+function addIngredient(mealIdx) { activeOpt(mealIdx).items.push({ food: "yogurt_greco", qty: 100 }); renderAll(); }
+function removeIngredient(mealIdx, itemIdx) { activeOpt(mealIdx).items.splice(itemIdx, 1); renderAll(); }
+
+function calcItemMacros(foodKey, qty) {
+  const f = FOODS[foodKey], r = qty / 100;
+  return { kcal: f.kcal * r, p: f.p * r, c: f.c * r, f: f.f * r };
+}
+
+function renderAll() {
+  const container = document.getElementById('meals-container');
+  container.innerHTML = '';
+  let totKcal = 0, totP = 0, totC = 0, totF = 0;
+
+  state.meals.forEach((meal, mIdx) => {
+    const opt = meal.options[meal.activeOption];
+    let mKcal = 0, mP = 0, mC = 0, mF = 0;
+    opt.items.forEach(it => {
+      const m = calcItemMacros(it.food, it.qty);
+      mKcal += m.kcal; mP += m.p; mC += m.c; mF += m.f;
+    });
+    totKcal += mKcal; totP += mP; totC += mC; totF += mF;
+
+    const card = document.createElement('div');
+    card.className = 'meal-card' + (meal.completed ? ' completed' : '');
+
+    let pillsHtml = '';
+    if (meal.options.length > 1) {
+      pillsHtml = `<div class="preset-options">` +
+        meal.options.map((o, oIdx) =>
+          `<button class="preset-pill ${oIdx === meal.activeOption ? 'active' : ''}" onclick="selectMealOption(${mIdx}, ${oIdx})">${o.label}</button>`
+        ).join('') + `</div>`;
+    }
+
+    const rowsHtml = opt.items.map((it, iIdx) => {
+      const fObj = FOODS[it.food];
+      const m = calcItemMacros(it.food, it.qty);
+      const optionsSelect = Object.keys(FOODS).map(k =>
+        `<option value="${k}" ${k === it.food ? 'selected' : ''}>${FOODS[k].name}</option>`
+      ).join('');
+      return `
+        <div class="ing-row">
+          <div class="ing-left">
+            <select class="food-select" onchange="changeFoodType(${mIdx}, ${iIdx}, this.value)">${optionsSelect}</select>
+          </div>
+          <div class="ing-controls">
+            <button class="qty-btn" onclick="adjustQty(${mIdx}, ${iIdx}, -10)">-</button>
+            <input type="number" class="qty-input" value="${it.qty}" onchange="setExactQty(${mIdx}, ${iIdx}, this.value)">
+            <span class="unit-label">${fObj.unit}</span>
+            <button class="qty-btn" onclick="adjustQty(${mIdx}, ${iIdx}, 10)">+</button>
+          </div>
+          <div class="ing-macros">
+            <strong>${Math.round(m.kcal)} kcal</strong> · P:${m.p.toFixed(0)} C:${m.c.toFixed(0)} F:${m.f.toFixed(0)}
+            <button class="del-btn" onclick="removeIngredient(${mIdx}, ${iIdx})" title="Rimuovi">✕</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="meal-top">
+        <div class="meal-title-wrap">
+          <input type="checkbox" class="meal-check" ${meal.completed ? 'checked' : ''} onchange="toggleMealComplete(${mIdx})">
+          <span class="meal-title">${meal.title}</span>
+          <span class="meal-time-tag">${meal.tag}</span>
+        </div>
+        <div class="meal-macros-pill">
+          <strong>${Math.round(mKcal)} kcal</strong> | P: <strong>${mP.toFixed(0)}g</strong> · C: <strong>${mC.toFixed(0)}g</strong> · F: <strong>${mF.toFixed(0)}g</strong>
+        </div>
+      </div>
+      ${pillsHtml}
+      ${meal.note ? `<div class="meal-note">💡 ${meal.note}</div>` : ''}
+      <div class="ingredients-list">${rowsHtml}</div>
+      <div class="add-ing-bar"><button class="add-btn" onclick="addIngredient(${mIdx})">+ Aggiungi alimento a questo pasto</button></div>`;
+
+    container.appendChild(card);
+  });
+
+  const t = getTargets();
+  updateBar('kcal', totKcal, t.kcal);
+  updateBar('pro', totP, t.p);
+  updateBar('cho', totC, t.c);
+  updateBar('fat', totF, t.f);
+  saveState();
+}
+
+function updateBar(key, cur, tar) {
+  const pct = Math.min(100, Math.round((cur / tar) * 100));
+  document.getElementById(key + '-cur').textContent = Math.round(cur);
+  document.getElementById(key + '-tar').textContent = tar;
+  document.getElementById(key + '-pct').textContent = pct + '%';
+  document.getElementById(key + '-bar').style.width = pct + '%';
+}
+
+loadState();
+syncControls();
+initPlan();
+</script>
+</body>
+</html>
